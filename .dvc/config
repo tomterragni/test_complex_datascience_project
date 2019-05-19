@@ -1,0 +1,4 @@
+['remote "DVC_local_repo"']
+url = /Users/tommasoterragni/DVC_local_repo
+[core]
+remote = DVC_local_repo
