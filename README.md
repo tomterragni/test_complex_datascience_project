@@ -1,9 +1,14 @@
-test_complex_datascience_project
+Test complex datascience project
 ==============================
 
 A test Data Science project including code and data versioning, model development, serialisation and serving, as well as dashboards, and notebooks.
 
-Project Organization
+
+
+
+
+
+Project Organization -  based on <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>
 ------------
 
     ├── LICENSE
