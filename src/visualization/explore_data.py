@@ -28,52 +28,53 @@ premiums = pd.read_csv(
     os.path.join(definitions.ROOT_DIR, 'data', 'external', 'premiums.csv'),
     sep = ';')
 
-options = [{'label': 'profile_{}'.format(bid), 'value': bid} for bid in
-           premiums['bid'].unique()]
-colors = [ 'red', 'orange', 'yellow', 'green', 'blue']
+options = [{'label': 'all_profiles', 'value': 'all'}]
+options.extend(
+    [{'label': 'profile_{}'.format(bid), 'value': bid} for bid in
+     premiums['bid'].unique()])
+
+colors = ['red', 'orange', 'yellow', 'green', 'blue']
 
 app.layout = html.Div([
-    html.H1( 'Premium analysis'),
+    html.H1('Premium analysis'),
 
     html.Div([
         dcc.Dropdown(
             id = 'my-dropdown',
             options = options,
-            value = 0
+            value = 'all'
         ),
         dcc.Graph(id = 'my-graph')
-        ], style = {'width': '500'})
-    ])
+    ], style = {'width': '500'})
+])
+
 
 @app.callback(Output('my-graph', 'figure'), [Input('my-dropdown', 'value')])
 def update_graph(selected_dropdown_value):
 
-    df = premiums[premiums['bid'] == selected_dropdown_value]
+    if selected_dropdown_value != 'all':
+        df = premiums[premiums['bid'] == int(selected_dropdown_value)]
+    else:
+        df = premiums
 
-    available_ratings = [r for r in df['defaqto_rating'].unique()]
+    available_ratings = [r for r in df['defaqto_rating'].dropna().unique()]
+    # available_ratings.dropna()
     available_ratings.sort()
-    # print('#############################')
-    # print(df['defaqto_rating'].unique())
-    # print('@@@@@@@@@')
-    # print(available_ratings)
     data = [go.Histogram(
-        x = df[df['defaqto_rating']==r]['amount'],
+        x = df[df['defaqto_rating'] == r]['amount'],
         nbinsx = 20,
         opacity = 0.75,
         name = 'rating = {:d}'.format(int(r)),
-        # marker = dict(color = 'rgb({}, {}, {})'.format(r*20, r*20, r*20))
-        marker = dict( color = colors[int(r)-1])
-        ) for r in available_ratings]
+        marker = dict(color = colors[int(r) - 1])) for r in available_ratings]
 
     layout = go.Layout(
-        #barmode='stack',
         xaxis = dict(title = 'premium (GBP)'),
         yaxis = dict(title = 'number of quotations'),
-        bargap=0.2,
-        bargroupgap=0.1
+        bargap = 0.2,
+        bargroupgap = 0.1
     )
 
-    return go.Figure(data=data, layout=layout)
+    return go.Figure(data = data, layout = layout)
 
 
 app.css.append_css(
